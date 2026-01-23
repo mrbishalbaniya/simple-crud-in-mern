@@ -5,24 +5,40 @@ const productRoute = require("./routes/product.route");
 const logger = require("./middleware/logger.middleware");
 const authRoute = require("./routes/auth.route");
 
-
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(logger); 
 app.use(express.static('public'));
 
-// Routes  
 app.use("/api/products", productRoute);
 app.use("/api/auth", authRoute);
 
-const dbURI = process.env.MONGO_URI;
-mongoose.connect(dbURI)
-    .then(() => console.log("Connected to DB!"))
-    .catch((err) => console.log("Error:", err));
+app.get("/", (req, res) => res.send("Welcome to the DashStock API"));
 
-app.get("/", (req, res) => res.send("Welcome to the API"));
+const startServer = async () => {
+    try {
+        const dbURI = process.env.MONGO_URI;
+        
+        if (!dbURI) {
+            throw new Error("MONGO_URI missing in .env");
+        }
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server on ${PORT}`));
+        // serverSelectionTimeoutMS prevents the 10s buffering hang
+        await mongoose.connect(dbURI, {
+            serverSelectionTimeoutMS: 5000 
+        });
+
+        console.log("Connected to MongoDB Atlas");
+
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (err) {
+        console.error("Connection error:", err.message);
+        process.exit(1);
+    }
+};
+
+startServer();
