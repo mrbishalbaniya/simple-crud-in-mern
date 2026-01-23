@@ -3,87 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Manager</title>
+    <title>DashStock | Inventory Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<body class="bg-slate-50 text-slate-900 leading-normal tracking-tight">
 
-    <div class="flex flex-col md:flex-row">
-        <aside class="bg-slate-900 text-white w-full md:w-64 min-h-screen p-4">
-            <div class="text-2xl font-bold mb-8 flex items-center px-2">
-                <span class="bg-blue-600 p-2 rounded-lg mr-2"><i class="fas fa-cube text-sm"></i></span>
-                DashStock
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="bg-slate-900 text-white w-full md:w-72 p-6 flex flex-col shadow-2xl z-20">
+            <div class="mb-10">
+                <div class="text-2xl font-extrabold flex items-center tracking-tighter">
+                    <div class="bg-blue-500 p-2 rounded-xl mr-3 shadow-lg shadow-blue-500/30">
+                        <i class="fas fa-layer-group text-white text-lg"></i>
+                    </div>
+                    DashStock<span class="text-blue-400">.</span>
+                </div>
             </div>
-            <nav class="space-y-2">
-                <a href="#" class="block py-2.5 px-4 rounded transition duration-200 bg-blue-600 text-white">
-                    <i class="fas fa-table mr-2"></i> Products
+            
+            <nav class="flex-1 space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-4 px-2">Main Menu</p>
+                <a href="#" class="group flex items-center py-3 px-4 rounded-xl transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+                    <i class="fas fa-box mr-3 opacity-80"></i> Inventory
+                </a>
+                <a href="#" class="group flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fas fa-chart-pie mr-3 opacity-50 group-hover:opacity-100 transition-opacity"></i> Analytics
+                </a>
+                <a href="#" class="group flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-slate-400 hover:bg-slate-800 hover:text-white">
+                    <i class="fas fa-cog mr-3 opacity-50 group-hover:opacity-100 transition-opacity"></i> Settings
                 </a>
             </nav>
+            
+            <div class="pt-6 border-t border-slate-800">
+                <button onclick="logout()" class="w-full flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-slate-400 hover:bg-rose-500/10 hover:text-rose-500 group">
+                    <i class="fas fa-sign-out-alt mr-3 group-hover:translate-x-1 transition-transform"></i> Logout
+                </button>
+            </div>
         </aside>
 
-        <main class="flex-1 p-6 md:p-10">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <main class="flex-1 p-6 md:p-12 overflow-y-auto custom-scrollbar">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Product Inventory</h1>
-                    <p class="text-gray-500">Manage your stock, prices, and descriptions.</p>
+                    <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Inventory</h1>
+                    <p class="text-slate-500 mt-1">Efficiently track and manage your stock levels.</p>
                 </div>
-                <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition">
-                    <i class="fas fa-plus mr-2"></i> New Product
+                <button onclick="openAddModal()" class="group bg-slate-900 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-2xl shadow-xl shadow-slate-900/20 transition-all duration-300 flex items-center">
+                    <i class="fas fa-plus mr-2 group-hover:scale-110 transition-transform"></i> New Product
+                </button>
+            </header>
+
+            <div class="mb-8 flex items-center gap-4">
+                <div class="relative flex-1 max-w-md group">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search products..." 
+                    class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all shadow-sm">
+                </div>
+                <button class="p-4 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all">
+                    <i class="fas fa-sliders-h"></i>
                 </button>
             </div>
 
-            <div class="mb-6 relative max-w-md">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search products by name or description..." 
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm">
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-slate-100">
+                    <thead class="bg-slate-50/50">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Product</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Price</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-8 py-5 text-left text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Product Info</th>
+                            <th class="px-8 py-5 text-left text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Price</th>
+                            <th class="px-8 py-5 text-left text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Status</th>
+                            <th class="px-8 py-5 text-right text-[11px] font-black text-slate-400 uppercase tracking-[0.1em]">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="productList" class="bg-white divide-y divide-gray-200 text-gray-700">
-                        </tbody>
+                    <tbody id="productList" class="divide-y divide-slate-100"></tbody>
                 </table>
-                <div id="noResults" class="hidden p-10 text-center text-gray-500">
-                    No products found matching your search.
+                <div id="noResults" class="hidden py-24 text-center">
+                    <div class="mb-4 text-slate-200"><i class="fas fa-box-open text-6xl"></i></div>
+                    <p class="text-slate-500 font-medium text-lg">No products found in your inventory.</p>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
-            <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-                <h3 id="modalTitle" class="text-xl font-bold text-gray-800">Add Product</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    <div id="productModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4 transition-all opacity-0">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-all">
+            <div class="px-10 py-8 border-b border-slate-50 flex justify-between items-center">
+                <h3 id="modalTitle" class="text-2xl font-bold text-slate-900">Add Product</h3>
+                <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-all">&times;</button>
             </div>
-            <form id="productForm" class="p-6 space-y-4">
+            <form id="productForm" class="p-10 space-y-6">
                 <input type="hidden" id="productId">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Product Name</label>
-                    <input type="text" id="name" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 ml-1">Product Name</label>
+                    <input type="text" id="name" required class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-100 outline-none transition-all placeholder:text-slate-300" placeholder="e.g. Wireless Headphones">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Price (Rs)</label>
-                    <input type="number" id="price" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 ml-1">Price (Rs)</label>
+                    <input type="number" id="price" required class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-100 outline-none transition-all" placeholder="0.00">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                    <textarea id="desc" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-700 ml-1">Description</label>
+                    <textarea id="desc" rows="3" class="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-100 outline-none transition-all placeholder:text-slate-300" placeholder="Describe the item..."></textarea>
                 </div>
-                <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" onclick="closeModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition">Cancel</button>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition">Save Product</button>
+                <div class="flex gap-4 mt-8 pt-4">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-4 text-slate-500 font-bold hover:text-slate-700 transition-colors">Cancel</button>
+                    <button type="submit" class="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -92,58 +128,56 @@
     <script>
         const API_URL = '/api/products';
         let isEditMode = false;
-        let allProducts = []; // Local cache to make searching fast
+        let allProducts = [];
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            };
+        }
 
         async function loadProducts() {
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_URL, { headers: getHeaders() });
+                if (res.status === 401) return logout();
                 allProducts = await res.json();
                 renderProducts(allProducts);
-            } catch (e) { 
-                console.error("API Error"); 
-                // Placeholder data for demo
-                allProducts = [
-                    {_id:'1', name:'Laptop', price: 75000, description: 'Gaming Laptop'},
-                    {_id:'2', name:'Mouse', price: 1500, description: 'Wireless Optical'}
-                ];
-                renderProducts(allProducts);
-            }
+            } catch (e) { console.error("API Error", e); }
         }
 
         function renderProducts(products) {
             const list = document.getElementById('productList');
             const noResults = document.getElementById('noResults');
+            list.innerHTML = '';
             
             if (products.length === 0) {
-                list.innerHTML = '';
                 noResults.classList.remove('hidden');
                 return;
             }
 
             noResults.classList.add('hidden');
             list.innerHTML = products.map(p => `
-                <tr class="hover:bg-blue-50 transition duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${p.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-blue-600 font-bold">Rs. ${p.price}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${p.description}</td>
-                    <td class="px-6 py-4 text-right space-x-3">
-                        <button onclick="editProduct('${p._id}', '${p.name}', ${p.price}, '${p.description}')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteProduct('${p._id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                <tr class="hover:bg-slate-50/80 transition-all group">
+                    <td class="px-8 py-6">
+                        <div class="font-bold text-slate-900 text-lg">${p.name}</div>
+                        <div class="text-slate-400 text-xs truncate max-w-[200px]">${p.description || 'No description provided'}</div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="text-slate-900 font-bold text-lg">Rs. ${p.price}</span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider rounded-full">In Stock</span>
+                    </td>
+                    <td class="px-8 py-6 text-right space-x-2">
+                        <button onclick="editProduct('${p._id}', '${p.name}', ${p.price}, '${p.description}')" class="p-2 text-slate-400 hover:text-blue-600 transition-colors"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteProduct('${p._id}')" class="p-2 text-slate-400 hover:text-rose-500 transition-colors"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function filterProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allProducts.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.description.toLowerCase().includes(query)
-            );
-            renderProducts(filtered);
-        }
-
-        // CRUD Logic
+        // Logic for handling forms remains the same...
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('productId').value;
@@ -152,26 +186,32 @@
                 price: document.getElementById('price').value,
                 description: document.getElementById('desc').value
             };
-
             const method = isEditMode ? 'PUT' : 'POST';
-            const url = isEditMode ? `/api/product/${id}` : API_URL;
-
-            try {
-                await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(productData)
-                });
-                closeModal();
-                loadProducts();
-            } catch(e) { alert("Action failed - check console."); }
+            const url = isEditMode ? `${API_URL}/${id}` : API_URL;
+            await fetch(url, { method, headers: getHeaders(), body: JSON.stringify(productData) });
+            closeModal();
+            loadProducts();
         };
+
+        async function deleteProduct(id) {
+            if(confirm('Delete this item?')) {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: getHeaders() });
+                loadProducts();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
 
         function openAddModal() {
             isEditMode = false;
-            document.getElementById('modalTitle').innerText = "Add New Product";
+            document.getElementById('modalTitle').innerText = "Add Product";
             document.getElementById('productForm').reset();
-            document.getElementById('productModal').classList.remove('hidden');
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.children[0].classList.remove('scale-95');
         }
 
         function editProduct(id, name, price, desc) {
@@ -181,18 +221,22 @@
             document.getElementById('name').value = name;
             document.getElementById('price').value = price;
             document.getElementById('desc').value = desc;
-            document.getElementById('productModal').classList.remove('hidden');
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.children[0].classList.remove('scale-95');
         }
 
         function closeModal() {
-            document.getElementById('productModal').classList.add('hidden');
+            const modal = document.getElementById('productModal');
+            modal.classList.add('opacity-0');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        async function deleteProduct(id) {
-            if(confirm('Are you sure?')) {
-                await fetch(`/api/product/${id}`, { method: 'DELETE' });
-                loadProducts();
-            }
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
         }
 
         loadProducts();
