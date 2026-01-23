@@ -19,21 +19,26 @@
     <script>
         document.getElementById('registerForm').onsubmit = async (e) => {
             e.preventDefault();
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            if (response.ok) {
-                alert("Registration successful! Please login.");
-                window.location.href = 'login.html';
-            } else {
-                alert("Registration failed.");
-            }
+            // public/register.html - Update the script
+const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    })
+});
+
+const data = await response.json(); // Get the actual error message
+
+if (response.ok) {
+    alert("Registration successful! Please login.");
+    window.location.href = 'login.html';
+} else {
+    // Show the specific error (e.g., "Email already exists")
+    alert("Error: " + (data.error || data.message || "Registration failed"));
+}
         };
     </script>
 </body>
