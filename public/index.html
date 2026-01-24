@@ -72,9 +72,19 @@
                     <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Search products..." 
                     class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all shadow-sm">
                 </div>
-                <button class="p-4 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all">
-                    <i class="fas fa-sliders-h"></i>
-                </button>
+               <div class="relative inline-block text-left">
+    <button onclick="toggleSortMenu()" class="p-4 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all focus:ring-4 focus:ring-slate-100">
+        <i class="fas fa-sliders-h"></i>
+    </button>
+    
+    <div id="sortMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-30 overflow-hidden">
+        <div class="p-2 space-y-1">
+            <button onclick="sortProducts('newest')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">Newest First</button>
+            <button onclick="sortProducts('low')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">Price: Low to High</button>
+            <button onclick="sortProducts('high')" class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors">Price: High to Low</button>
+        </div>
+    </div>
+</div>
             </div>
 
             <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
@@ -240,6 +250,38 @@
         }
 
         loadProducts();
+
+        // Toggle the Sort Dropdown visibility
+function toggleSortMenu() {
+    const menu = document.getElementById('sortMenu');
+    menu.classList.toggle('hidden');
+    
+    // Close menu when clicking outside
+    const closeMenu = (e) => {
+        if (!e.target.closest('.relative')) {
+            menu.classList.add('hidden');
+            document.removeEventListener('click', closeMenu);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+}
+
+// Sort logic
+function sortProducts(criteria) {
+    let sorted = [...allProducts]; // Copy the array
+
+    if (criteria === 'low') {
+        sorted.sort((a, b) => a.price - b.price);
+    } else if (criteria === 'high') {
+        sorted.sort((a, b) => b.price - a.price);
+    } else if (criteria === 'newest') {
+        // Assuming your API returns objects with an _id or timestamp
+        sorted.reverse(); 
+    }
+
+    renderProducts(sorted);
+    document.getElementById('sortMenu').classList.add('hidden');
+}
     </script>
 </body>
 </html>

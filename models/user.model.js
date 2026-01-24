@@ -16,7 +16,8 @@ userSchema.pre('save', async function () {
         // 2. Generate salt and hash
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-        // Note: No next() here! Mongoose handles it via the async return.
+
+         
     } catch (err) {
         throw new Error(err); // Mongoose will catch this as a validation error
     }
