@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const protect = require("../middleware/auth.middleware"); // Import the middleware
 const { 
     getProducts, 
     getProduct, 
@@ -8,14 +9,14 @@ const {
     deleteProduct 
 } = require("../controllers/product.controller");
 
-// Grouping routes by path
+// Everyone can view products, but only logged-in users can modify
 router.route("/")
     .get(getProducts)
-    .post(createProduct);
+    .post(protect, createProduct); // Added protect
 
 router.route("/:id")
     .get(getProduct)
-    .put(updateProduct)
-    .delete(deleteProduct);
+    .put(protect, updateProduct)   // Added protect
+    .delete(protect, deleteProduct); // Added protect
 
 module.exports = router;
