@@ -17,7 +17,11 @@ const getProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id);
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -40,8 +44,15 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        const product = await Product.findByIdAndUpdate(id, req.body, { 
+            new: true, 
+            runValidators: true // Ensures the update follows your Model rules
+        });
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -54,13 +65,18 @@ const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const product = await Product.findByIdAndDelete(id);
-        if (!product) return res.status(404).json({ message: "Product not found" });
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
         res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+// Exporting all functions to be used in routes/product.route.js
 module.exports = {
     getProducts,
     getProduct,

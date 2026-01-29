@@ -19,7 +19,7 @@ userSchema.pre('save', async function () {
 
          
     } catch (err) {
-        throw new Error(err); // Mongoose will catch this as a validation error
+        throw new Error(err);  
     }
 });
 
