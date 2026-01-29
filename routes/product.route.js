@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const protect = require("../middleware/auth.middleware"); // Import the guard
 
-// Import the controller functions
 const { 
     getProducts, 
     getProduct, 
@@ -10,15 +10,13 @@ const {
     deleteProduct 
 } = require("../controllers/product.controller");
 
-// Route for getting all products and creating a new product
-router.route("/")
-    .get(getProducts)
-    .post(createProduct);
+// Public routes (Everyone can see)
+router.get("/", getProducts);
+router.get("/:id", getProduct);
 
-// Route for operations on a specific product by ID
-router.route("/:id")
-    .get(getProduct)
-    .put(updateProduct)
-    .delete(deleteProduct);
+// Protected routes (Only logged-in users can modify)
+router.post("/", protect, createProduct);
+router.put("/:id", protect, updateProduct);
+router.delete("/:id", protect, deleteProduct);
 
 module.exports = router;
